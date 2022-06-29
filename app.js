@@ -11,10 +11,11 @@ let todos = [];
 
 // Action Handlers
 async function handlePageLoad() {
-    user = getUser();
+    user = await getUser();
     protectPage(user);
 
     // *** set todos state from get all service function
+    todos = await getAllTodos();
 
     display();
 }
@@ -27,7 +28,13 @@ async function handleAdd(task) {
     // *** 
     // 1. create a new todo with description set to task and complete false
     // 2. push the new todo into the todos array
-
+    const taskToAdd = {
+        description: task,
+        complete: false,
+    };
+    
+    todos.push(await createTodo(taskToAdd));
+    
     display();
 }
 
@@ -36,6 +43,15 @@ async function handleComplete(todo) {
     // 1. Toggle todo complete property
     // 2. Get the index of the current todo
     // 3. Update that index of the array with the result of the update service function
+    if (!todo.complete) {
+        todo.complete = true;
+    } 
+    else {
+        todo.complete = false;
+    }
+
+    const index = todos.indexOf(todo);
+    todos[index] = await updateTodo(todo);
 
     display();
 }
@@ -45,7 +61,9 @@ async function handleEdit(todo, task) {
     // 1. Set the todo description to the new task text
     // 2. Get the index of the current todo
     // 3. Update that index of the array with the result of the update service function
-
+    todo.description = task;
+    const index = todos.indexOf(todo);
+    todos[index] = await updateTodo(todo);
     display();
 }
 
@@ -54,7 +72,9 @@ async function handleDelete(todo) {
     // 1. Get the index of the current todo
     // 2. Call the delete service function
     // 3. remove the todo from the todos array using splice
-
+    const index = todos.indexOf(todo);
+    deleteTodo(todo);
+    todos.splice(index, 1);
     display();
 }
 
